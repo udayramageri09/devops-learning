@@ -1,0 +1,26 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-minikube
+  template:
+    metadata:
+      labels:
+        app: flask-minikube
+    spec:
+      containers:
+        - name: flask
+          image: flask-minikube:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 15000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 15000
+            initialDelaySeconds: 3
+            periodSeconds: 5

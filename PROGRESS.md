@@ -32,3 +32,25 @@ Status: Completed and verified
 
 ### Next
 Exercise 02 — Flask Application on Minikube.
+
+## Exercise 02 — Flask Application on Minikube
+Date: 19 October 2026
+Status: Completed and verified
+
+### Implementation
+- Created a Python Flask application.
+- Created requirements.txt and Dockerfile.
+- Built the flask-minikube:v1 Docker image.
+- Loaded the image into Minikube.
+- Created a Kubernetes Deployment with imagePullPolicy: Never.
+- Exposed Flask using a NodePort Service on port 15000.
+- Configured an HTTP readiness probe.
+
+### Verification
+- Flask Pod: 1/1 Running
+- Container restarts: 0
+- Home endpoint: HTTP 200 OK
+- Health endpoint: HTTP 200 OK
+
+### Next
+Exercise 03 — Flask ReplicaSet Scaling and Self-Healing.
