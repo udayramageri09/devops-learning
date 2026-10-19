@@ -1,0 +1,18 @@
+﻿#include <tunables/global>
+
+profile devops-lab-profile flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+
+  network inet stream,
+  network inet6 stream,
+
+  /bin/** rix,
+  /usr/bin/** rix,
+  /lib/** rm,
+  /lib64/** rm,
+  /usr/lib/** rm,
+
+  /tmp/** rw,
+  /proc/** r,
+  /sys/** r,
+}

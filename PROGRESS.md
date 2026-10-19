@@ -76,3 +76,21 @@ Status: Completed and verified
 - Connected Flask to MySQL and Redis using container hostnames.
 - Verified /check returned HTTP 200 OK.
 - Verified both MySQL and Redis reported connected.
+
+## Exercise 05 — Docker Security and Python Docker SDK
+Date: 19 October 2026
+Status: Partially completed — Docker SDK verified; AppArmor unavailable
+
+### Verified
+- Connected Python Docker SDK to Docker Engine 29.8.2.
+- Listed containers.
+- Created and executed a temporary Alpine container.
+- Confirmed exit code 0.
+- Retrieved logs and removed the container.
+- Inspected Docker security options.
+
+### Environment Limitation
+- Docker reported seccomp and cgroupns, but not AppArmor.
+- WSL Ubuntu reported that the AppArmor filesystem was not mounted.
+- Custom AppArmor profile enforcement was not demonstrated.
+- Included an illustrative AppArmor profile for reference.
