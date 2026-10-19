@@ -118,3 +118,14 @@ Status: Completed and verified
 - Created Freestyle job devops-hello-world.
 - Executed shell commands.
 - Verified build #1 finished with SUCCESS.
+
+## Exercise 08 — Jenkins GitHub Integration
+Date: 19 October 2026
+Status: Completed — manual GitHub checkout and build verified
+
+- Created Jenkins Freestyle job devops-github-hello-world.
+- Connected the GitHub repository using Git SCM.
+- Checked out the main branch at commit f72f413.
+- Executed shell commands successfully.
+- Verified build #1 finished with SUCCESS.
+- Automatic webhook triggering not tested.
