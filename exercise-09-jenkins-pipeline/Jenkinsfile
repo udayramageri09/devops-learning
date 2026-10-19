@@ -1,0 +1,64 @@
+﻿pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building Flask application'
+                sh 'python3 --version'
+                sh 'python3 -m venv /tmp/devops-flask-venv'
+                sh '/tmp/devops-flask-venv/bin/pip install -r exercise-02-minikube-flask/requirements.txt'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Checking Python syntax'
+                sh '/tmp/devops-flask-venv/bin/python -m py_compile exercise-02-minikube-flask/app.py'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Preparing application for deployment'
+                sh 'mkdir -p /tmp/devops-flask-deploy'
+                sh 'cp exercise-02-minikube-flask/app.py /tmp/devops-flask-deploy/app.py'
+            }
+        }
+
+        stage('Run Application') {
+            steps {
+                echo 'Starting Flask application'
+                sh '''
+                    cd /tmp/devops-flask-deploy
+                    nohup /tmp/devops-flask-venv/bin/python app.py > flask.log 2>&1 &
+                    echo $! > flask.pid
+                    sleep 5
+                '''
+            }
+        }
+
+        stage('Test Application') {
+            steps {
+                echo 'Testing Flask HTTP endpoint'
+                sh 'curl --fail http://localhost:15000/health'
+            }
+        }
+    }
+
+    post {
+        always {
+            sh '''
+                if [ -f /tmp/devops-flask-deploy/flask.pid ]; then
+                    kill $(cat /tmp/devops-flask-deploy/flask.pid) 2>/dev/null || true
+                fi
+            '''
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check console output.'
+        }
+    }
+}
