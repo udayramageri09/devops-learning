@@ -143,3 +143,21 @@ Status: Completed and verified
 - Started the Flask application.
 - Verified /health returned {"status":"healthy"}.
 - Jenkins pipeline finished with SUCCESS.
+
+## Exercise 10 — Multinode Kubernetes Cluster
+Date: 19 October 2026
+Status: Completed and verified
+
+- Created a three-node Minikube cluster.
+- Verified all three nodes were Ready.
+- Enabled the registry addon.
+- Deployed Product Catalog with 2/2 replicas Ready.
+- Deployed Shopping Cart with 3/3 replicas Ready.
+- Verified preferred pod anti-affinity distribution.
+- Verified Product Catalog Service returned HTTP 200.
+- Verified Shopping Cart Service returned HTTP 200.
+- All five application Pods were Running with zero restarts.
+
+Limitations:
+- Both applications use Nginx demonstration containers.
+- Registry addon was enabled, but image push/pull was not tested.
