@@ -65,3 +65,14 @@ Status: Completed and verified
 - Deleted one Pod to demonstrate self-healing.
 - Kubernetes automatically created a replacement.
 - Verified five running Pods with zero restarts.
+
+## Exercise 04 — Docker Networking
+Date: 19 October 2026
+Status: Completed and verified
+
+- Created the devops-lab-network custom bridge network.
+- Started MySQL and Redis containers.
+- Built a Dockerized Flask application.
+- Connected Flask to MySQL and Redis using container hostnames.
+- Verified /check returned HTTP 200 OK.
+- Verified both MySQL and Redis reported connected.
