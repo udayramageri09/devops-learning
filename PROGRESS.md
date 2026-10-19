@@ -108,3 +108,13 @@ Status: Monitoring and Grafana alert verified; Jenkins integration pending
 - Triggered the alert with active_users = 95.
 - Verified Grafana displayed 1 firing alert.
 - Jenkins integration remains pending.
+
+## Exercise 07 — Jenkins Installation and CI/CD
+Date: 19 October 2026
+Status: Completed and verified
+
+- Installed Jenkins LTS using Docker.
+- Configured Jenkins on localhost:8081.
+- Created Freestyle job devops-hello-world.
+- Executed shell commands.
+- Verified build #1 finished with SUCCESS.
