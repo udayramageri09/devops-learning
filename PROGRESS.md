@@ -129,3 +129,17 @@ Status: Completed — manual GitHub checkout and build verified
 - Executed shell commands successfully.
 - Verified build #1 finished with SUCCESS.
 - Automatic webhook triggering not tested.
+
+## Exercise 09 — Jenkins Multistage CI/CD Pipeline
+Date: 19 October 2026
+Status: Completed and verified
+
+- Created a Jenkins Declarative Pipeline stored in GitHub.
+- Implemented Build, Test, Deploy, Run Application and Test Application.
+- Installed Python 3.13.5 inside the Jenkins container.
+- Fixed a UTF-8 BOM parsing issue in the Jenkinsfile.
+- Successfully installed Flask 3.1.1.
+- Verified Python syntax compilation.
+- Started the Flask application.
+- Verified /health returned {"status":"healthy"}.
+- Jenkins pipeline finished with SUCCESS.
