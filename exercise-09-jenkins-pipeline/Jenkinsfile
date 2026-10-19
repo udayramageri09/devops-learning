@@ -11,12 +11,12 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                echo 'Checking Python syntax'
-                sh '/tmp/devops-flask-venv/bin/python -m py_compile exercise-02-minikube-flask/app.py'
-            }
-        }
+    	stage('Test') {
+    	    steps {
+        	echo 'Running Flask unit tests'
+        	sh '/tmp/devops-flask-venv/bin/python -m unittest discover -s exercise-02-minikube-flask -p "test_*.py" -v'
+    	    }
+	}
 
         stage('Deploy') {
             steps {
