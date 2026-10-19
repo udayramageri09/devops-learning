@@ -54,3 +54,14 @@ Status: Completed and verified
 
 ### Next
 Exercise 03 — Flask ReplicaSet Scaling and Self-Healing.
+
+## Exercise 03 — ReplicaSet Scaling and Self-Healing
+Date: 19 October 2026
+Status: Completed and verified
+
+- Deployed Flask using a Kubernetes ReplicaSet.
+- Scaled from 3 to 5 replicas.
+- Configured readiness and liveness probes.
+- Deleted one Pod to demonstrate self-healing.
+- Kubernetes automatically created a replacement.
+- Verified five running Pods with zero restarts.
