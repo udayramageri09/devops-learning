@@ -94,3 +94,17 @@ Status: Partially completed — Docker SDK verified; AppArmor unavailable
 - WSL Ubuntu reported that the AppArmor filesystem was not mounted.
 - Custom AppArmor profile enforcement was not demonstrated.
 - Included an illustrative AppArmor profile for reference.
+
+## Exercise 06 — Monitoring and Alerting
+Date: 19 October 2026
+Status: Monitoring and Grafana alert verified; Jenkins integration pending
+
+- Created a Flask application exposing Prometheus metrics.
+- Implemented request counter and active-user gauge.
+- Configured Prometheus scraping.
+- Connected Grafana to Prometheus.
+- Created dashboard panels for monitoring metrics.
+- Configured an alert when active users exceed 80.
+- Triggered the alert with active_users = 95.
+- Verified Grafana displayed 1 firing alert.
+- Jenkins integration remains pending.

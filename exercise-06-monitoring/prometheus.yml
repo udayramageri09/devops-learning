@@ -1,0 +1,7 @@
+﻿global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "flask-monitoring"
+    static_configs:
+      - targets: ["lab-monitoring-app:8000"]
