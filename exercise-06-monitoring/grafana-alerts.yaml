@@ -1,0 +1,55 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name: devops-monitoring-group
+      folder: DevOps Lab Alerts
+      interval: 1m
+      rules:
+        - uid: bg1ot9jsj8bnke
+          title: High Active Users
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: dg1orw1frhp1ce
+              model:
+                editorMode: builder
+                expr: lab_active_users
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 80
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          isPaused: false
+          notification_settings:
+            receiver: grafana-default-email
