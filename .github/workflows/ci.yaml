@@ -70,7 +70,7 @@ jobs:
       - name: Validate AppArmor Profile Syntax
         run: |
           sudo apt-get update && sudo apt-get install -y apparmor
-          apparmor_parser -Q exercise-05-docker-security/apparmor-profile
+          apparmor_parser -Q -K exercise-05-docker-security/apparmor-profile
           echo "AppArmor profile syntax is valid."
 
       - name: Build Exercise 02 Image
