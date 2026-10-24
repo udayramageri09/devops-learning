@@ -1,4 +1,4 @@
-﻿# Exercise 09 — Jenkins Multistage CI/CD Pipeline
+# Exercise 09 — Jenkins Multistage CI/CD Pipeline
 
 ## Objective
 Create and execute a Jenkins Declarative Pipeline with five stages:
@@ -24,7 +24,7 @@ Build, Test, Deploy, Run Application, and Test Application.
 Created a Python virtual environment and installed Flask dependencies.
 
 ### 2. Test
-Checked Python application syntax using py_compile.
+Ran Flask unit tests using Python unittest discovery. Both test_health and test_home passed.
 
 ### 3. Deploy
 Copied the Flask application into a deployment directory.
@@ -42,11 +42,25 @@ Expected response:
 ## Verified Results
 - All five stages completed successfully.
 - Flask dependencies installed.
-- Python syntax check passed.
+- Both Flask unit tests passed (test_health and test_home).
 - Application started successfully.
 - HTTP health check returned a healthy status.
 - Jenkins final result: SUCCESS.
 
+## Latest Verified Jenkins Execution
+
+- GitHub branch: main
+- Verified commit: 2a99f23f442d5f511a58aa9457b5934f171af6c0
+- Pipeline definition: exercise-09-jenkins-pipeline/Jenkinsfile
+- Build: Python environment prepared and Flask dependencies installed.
+- Test: Two Flask unit tests passed (test_health and test_home).
+- Deploy: Flask application copied into the local deployment directory.
+- Run Application: Flask application started inside Jenkins.
+- Test Application: Health endpoint returned {"status":"healthy"}.
+- Post-build cleanup: Flask process stopped.
+- Final Jenkins result: SUCCESS.
+
+Deployment was local to Jenkins, not production.
 ## Troubleshooting
 The first pipeline attempt failed because the Jenkinsfile contained
 a UTF-8 Byte Order Mark (BOM). Saving the Jenkinsfile as UTF-8
@@ -57,7 +71,7 @@ the original Jenkins image did not contain Python.
 
 ## Limitations
 - Deployment is local to the Jenkins container, not production.
-- The test stage checks syntax rather than running a full test suite.
+- The test stage runs two Flask unit tests; broader integration, security, and performance testing are not included.
 - Python installed directly in the container will not survive
   container recreation unless included in a custom image.
 

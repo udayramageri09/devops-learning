@@ -1,4 +1,4 @@
-﻿# DevOps Lab — Faculty Evaluation Preparation
+# DevOps Lab — Faculty Evaluation Preparation
 
 ## Repository
 https://github.com/udayramageri09/devops-learning
@@ -15,9 +15,20 @@ https://github.com/udayramageri09/devops-learning
 | 06 | Monitoring | Prometheus metrics, Grafana dashboard, firing alert |
 | 07 | Jenkins | Successful Freestyle build |
 | 08 | Jenkins and GitHub | Successful repository checkout and build |
-| 09 | Jenkins Pipeline | Five-stage pipeline completed successfully |
+| 09 | Jenkins Pipeline | Five-stage pipeline SUCCESS on main; 2 Flask unit tests passed; health check successful |
 | 10 | Multinode Kubernetes | Three Ready nodes, five Pods, Service HTTP 200 |
 
+## Exercise 09 — Latest Verified Pipeline
+
+- Jenkins job: devops-python-pipeline
+- GitHub branch: main
+- Verified Git commit: 2a99f23f442d5f511a58aa9457b5934f171af6c0
+- Successful stages: Build, Test, Deploy, Run Application, Test Application
+- Unit tests: test_health and test_home both passed (2/2).
+- Health endpoint: http://localhost:15000/health
+- Health response: {"status":"healthy"}
+- Final Jenkins console result: Finished: SUCCESS
+- Deployment scope: Local to the Jenkins container.
 ## Important Demonstration Commands
 
 docker ps
@@ -43,7 +54,7 @@ These URLs require the corresponding local containers to be running.
 
 - AppArmor enforcement was not demonstrated in the WSL environment.
 - Jenkins GitHub integration was tested with a manual build, not a webhook.
-- Exercise 09 uses a local container deployment and syntax test.
+- Exercise 09 deploys locally inside Jenkins, not to production. Its test stage runs two Flask unit tests; broader automated testing is not included.
 - Exercise 10 uses Nginx demonstration workloads.
 - Minikube registry was enabled, but image push and pull were not tested.
 
