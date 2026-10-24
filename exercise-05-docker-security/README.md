@@ -94,3 +94,7 @@ The **normal execution path** was verified. The error-handling path was **not de
 ## Conclusion
 
 Successfully demonstrated Docker container management using Python. Inspected the available Docker security mechanisms and documented the AppArmor enforcement limitation.
+
+## Seccomp Verification
+
+See [SECCOMP_VERIFICATION.md](SECCOMP_VERIFICATION.md) for verified Docker security test results.
