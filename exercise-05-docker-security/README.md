@@ -2,171 +2,216 @@
 
 ## Objective
 
-Study Docker container security using AppArmor and manage Docker containers programmatically using the Python Docker SDK.
+Study Docker container security mechanisms (Seccomp and AppArmor), implement a hardened container workload, and manage Docker containers programmatically using the Python Docker SDK.
 
-## Files
+---
 
-- `apparmor-profile` — Example AppArmor policy (not enforced)
-- `docker_sdk_demo.py` — Python Docker SDK demonstration
-- `requirements.txt` — Python dependency list
+## Files in this Directory
 
-## Part A — AppArmor
+- `app.py`: Lightweight Python/Flask web microservice with `/` and `/health` endpoints.
+- `Dockerfile`: Hardened container definition configured with an unprivileged system user (`appuser`).
+- `.dockerignore`: Excludes caches, temporary files, and backups from Docker build context.
+- `apparmor-profile`: Example AppArmor Mandatory Access Control (MAC) profile (`devops-lab-profile`).
+- `apply_apparmor.py`: Diagnostic and verification script checking Docker daemon security, profile syntax, and container attachment.
+- `test_restricted_actions.py`: Structured test harness comparing baseline Linux DAC behavior with expected MAC security rules.
+- `test_app.py`: Unit tests for the Flask microservice (`/` and `/health`).
+- `docker_sdk_demo.py`: Programmatic container management demonstration using the Python Docker SDK.
+- `requirements.txt`: Python dependencies (`docker==7.1.0`, `Flask==3.1.1`).
+- `SECCOMP_VERIFICATION.md`: Verification logs demonstrating Docker default Seccomp syscall filtering.
 
-### Commands
+---
+
+## Security Architecture & Design
+
+### 1. Hardened Dockerfile
+Running containers as root (UID 0) presents a severe privilege-escalation risk if an application vulnerability is exploited.
+The Dockerfile is hardened with:
+- **Non-root user:** Creates system group `appgroup` and system user `appuser` (UID 999), executing the process without root privileges.
+- **Minimal attack surface:** Built on `python:3.12-slim`.
+- **Clean execution:** Sets `PYTHONDONTWRITEBYTECODE=1` and `PYTHONUNBUFFERED=1` for immediate stdout/stderr streaming.
+- **Restricted file ownership:** Application files are owned by `appuser:appgroup` with no write permissions to system directories.
+
+### 2. Refined AppArmor Profile (`devops-lab-profile`)
+Earlier naive rules (such as `deny /bin/** x` or `deny /usr/bin/** x` and `deny /etc/** r`) prevented the container from launching because Python, libc dynamic linkers (`/etc/ld.so.cache`), and DNS resolution (`/etc/resolv.conf`) were blocked.
+
+The refined profile demonstrates precise Mandatory Access Control:
+- **Allows Application Runtime:** Permits standard Python interpreters, shared libraries, and network stream binding for HTTP services.
+- **Drops Dangerous Capabilities:** Retains `net_bind_service` but explicitly denies `sys_admin`, `sys_ptrace`, `sys_rawio`, and `sys_module`.
+- **System Binary Tamper Protection:** Denies write access to `/bin/**`, `/sbin/**`, `/usr/**`, and `/lib/**`.
+- **Credential Protection:** Denies all access to `/etc/shadow*`, `/etc/gshadow*`, `/etc/sudoers*`, and `/root/**`.
+- **Administrative Tool Execution Denial:** Denies execution of administrative and package management tools (`/sbin/**`, `/usr/sbin/**`, `apt`, `dpkg`).
+
+---
+
+## Verification & Commands
+
+### 1. Validate AppArmor Profile Syntax
+The profile syntax was verified using the AppArmor parser:
 
 ```powershell
-docker info --format '{{json .SecurityOptions}}'
-docker run --rm alpine:3.20 cat /proc/1/attr/current
+wsl apparmor_parser -Q exercise-05-docker-security/apparmor-profile
 ```
 
-### Observations
+**Observed Result:**
+- Exit code: `0`
+- Result: **Syntax Valid**
+- *Important note:* Syntax validation only confirms that the rules are syntactically well-formed; it does not mean the profile is loaded or enforced in the kernel.
 
-Docker security options observed:
-
-- Seccomp with the built-in profile
-- Cgroup namespaces
-
-Container security label reported: `kernel`.
-
-Ubuntu WSL observations:
-
-- AppArmor module loaded
-- AppArmor filesystem not mounted
-
-### Result
-
-AppArmor enforcement could not be demonstrated in the current Docker Desktop and WSL2 environment.
-
-The included AppArmor profile is an example only. It was **not loaded, validated, or enforced**.
-
-## Part B — Python Docker SDK
-
-### Install dependencies
-
-From the repository root in PowerShell:
+### 2. Run AppArmor Diagnostic & Lifecycle Test
+Executes `apply_apparmor.py` to evaluate the 5 security stages:
 
 ```powershell
-py -m pip install -r .\exercise-05-docker-security\requirements.txt
+py .\exercise-05-docker-security\apply_apparmor.py
 ```
 
-### Run demonstration
+**Observed Output:**
+```text
+============================================================
+Exercise 05 — Docker AppArmor Diagnostic & Verification
+============================================================
+
+[Stage 1] Docker Engine Security Options: ['name=seccomp,profile=builtin', 'name=cgroupns']
+         Docker AppArmor Support: DISABLED / UNAVAILABLE
+
+[Stage 2] Profile Syntax Validation:
+         Profile file: apparmor-profile
+         Parser available: True
+         Syntax valid: True
+         Details: Profile syntax is valid (apparmor_parser -Q returned 0)
+
+[Stage 3] Building image devops-ex05-apparmor:lab...
+         Image build successful.
+
+[Stage 4] Docker AppArmor unsupported; launching baseline unconfined container
+         Configured SecurityOpt: []
+
+[Stage 5] Starting container to inspect live execution...
+         Container exit code: 0
+         Container output:
+           Container running as UID=999
+           Security label (/proc/1/attr/current): kernel
+
+------------------------------------------------------------
+SUMMARY EVALUATION:
+ - Docker AppArmor Support  : Absent
+ - Profile Syntax Check     : Valid
+ - Security Profile Attach  : Skipped (daemon unsupported)
+ - Custom Enforcement       : NOT VERIFIED (WSL2/Docker environment does not enforce custom AppArmor profiles)
+ - Baseline Security Status : PASSED (hardened non-root user + baseline Docker container execution)
+------------------------------------------------------------
+
+Temporary container 'ex05-verify-...' removed cleanly.
+```
+
+### 3. Run Restricted Actions Test Suite
+Executes `test_restricted_actions.py` to verify baseline DAC behavior and test restricted actions:
+
+```powershell
+py .\exercise-05-docker-security\test_restricted_actions.py
+```
+
+**Observed Output:**
+```text
+=================================================================
+Exercise 05 — Container Security & Restricted Actions Test
+=================================================================
+Docker security options : ['name=seccomp,profile=builtin', 'name=cgroupns']
+Docker AppArmor support : False
+
+[NOTE] AppArmor is unavailable in the tested WSL2/Docker environment.
+       Running baseline tests to verify least-privilege security behavior.
+       Command failures MUST NOT be misattributed to AppArmor MAC denials.
+
+Created test container   : 492f39fb1c28 (ex05-test-2f646300)
+Configured SecurityOpt   : []
+Container security label : kernel
+
+=================================================================
+RUNNING SECURITY TEST CASES
+=================================================================
+
+--- Test 1: Allowed Action — Python Interpreter Execution ---
+Command     : python -c import sys; print(f'Python {sys.version.split()[0]} is operational')
+Exit code   : 0
+Output      : Python 3.12.15 is operational
+Attribution : Baseline SUCCESS (allowed by standard OS permissions).
+
+--- Test 2: Allowed Action — Standard Config File Read ---
+Command     : cat /etc/hosts
+Exit code   : 0
+Attribution : Baseline SUCCESS (allowed by standard OS permissions).
+
+--- Test 3: Restricted Action — Sensitive Credentials Access (/etc/shadow) ---
+Command     : cat /etc/shadow
+Exit code   : 1
+Output      : cat: /etc/shadow: Permission denied
+Attribution : Baseline DENIED via Linux DAC (Discretionary Access Control — non-root UID 999).
+              Note: This is NOT an AppArmor MAC denial because AppArmor is disabled.
+
+--- Test 4: Restricted Action — System Directory Modification (/usr/test_tamper) ---
+Command     : touch /usr/test_tamper.tmp
+Exit code   : 1
+Output      : touch: cannot touch '/usr/test_tamper.tmp': Permission denied
+Attribution : Baseline DENIED via Linux DAC (Discretionary Access Control — non-root UID 999).
+              Note: This is NOT an AppArmor MAC denial because AppArmor is disabled.
+
+--- Test 5: Restricted Action — Administrative Command Execution (/sbin) ---
+Command     : /bin/sh -c ls /sbin/fdisk 2>/dev/null || ls /sbin/apk 2>/dev/null || echo 'sbin utility restricted/absent'
+Exit code   : 0
+Output      : sbin utility restricted/absent
+Attribution : Baseline SUCCESS (allowed by standard OS permissions).
+
+=================================================================
+TEST SUITE SUMMARY:
+ - AppArmor Enforced       : False
+ - Non-Root DAC Protection : VERIFIED (UID 999 restricted from /etc/shadow and /usr writes)
+ - Test Suite Result       : PASSED
+=================================================================
+
+Temporary container 'ex05-test-...' removed cleanly.
+```
+
+### 4. Run Flask Application Unit Tests
+Tests the Flask endpoints without requiring Docker:
+
+```powershell
+py -m unittest discover -s exercise-05-docker-security -p "test_*.py" -v
+```
+
+**Observed Result:**
+```text
+test_health_endpoint (test_app.Exercise05FlaskSecurityTests.test_health_endpoint) ... ok
+test_home_endpoint (test_app.Exercise05FlaskSecurityTests.test_home_endpoint) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.014s
+
+OK
+```
+
+### 5. Run Python Docker SDK Demonstration
+Demonstrates programmatic lifecycle control:
 
 ```powershell
 py .\exercise-05-docker-security\docker_sdk_demo.py
 ```
 
-### Verified Results
-
+**Observed Result:**
 - Connected to Docker Engine `29.8.2`
-- Listed existing containers
-- Created an Alpine test container
-- Executed a command successfully
-- Received exit code `0`
-- Retrieved container logs
-- Removed the temporary container
+- Enumerated running lab containers
+- Created, waited, logged, and safely destroyed an isolated Alpine test container (`exit code: 0`)
 
-### Reliability Improvements
+---
 
-The Docker SDK script was improved to make repeated execution and cleanup more reliable:
+## Seccomp Verification Summary
 
-- Uses `try/finally` to attempt removal of the temporary container even if execution fails
-- Allows Docker to generate a unique container name, avoiding naming conflicts
-- Checks the container exit code and raises an error if the command fails
-- Uses `container.remove(force=True)` during cleanup
+As detailed in [SECCOMP_VERIFICATION.md](SECCOMP_VERIFICATION.md):
+- **Built-in Seccomp profile:** Verified enabled (`Seccomp: 2` reported by kernel in `/proc/self/status`).
+- **Unconfined mode:** Verified with `--security-opt seccomp=unconfined`.
 
-### Updated Verification
+---
 
-The improved script was executed successfully using Docker Engine `29.8.2`:
+## Known Environment Limitations & Conclusion
 
-- Container command exit code: `0`
-- Expected container output received
-- Temporary container removed successfully
-
-The **normal execution path** was verified. The error-handling path was **not deliberately tested**.
-
-## Important Concepts
-
-- **AppArmor:** Linux mandatory access control system that restricts program actions.
-- **Seccomp:** Restricts the system calls available to processes.
-- **Docker SDK:** Python library for communicating with the Docker Engine API.
-- **Container isolation:** Docker uses Linux kernel features to isolate container processes.
-
-## Conclusion
-
-Successfully demonstrated Docker container management using Python. Inspected the available Docker security mechanisms and documented the AppArmor enforcement limitation.
-
-## Seccomp Verification
-
-See [SECCOMP_VERIFICATION.md](SECCOMP_VERIFICATION.md) for verified Docker security test results.
-
-
-## Final Security Verification
-
-Environment: Windows 11, Docker Desktop, Ubuntu WSL2.
-
-### Docker Security
-
-- Docker security options: seccomp (builtin profile), cgroupns.
-- Seccomp: enabled.
-- AppArmor: not reported by Docker.
-
-### WSL2 Verification
-
-- Kernel: 6.18.54.1-microsoft-standard-WSL2.
-- AppArmor kernel parameter: N (disabled).
-
-### Final Result
-
-- Python Docker SDK: completed and verified.
-- Container creation, execution, logs and cleanup: verified.
-- Seccomp security profile: enabled.
-- Custom AppArmor profile enforcement: not demonstrated.
-
-**Overall status: Partially completed because AppArmor is disabled in the current WSL2 environment.**
-
-## Extended Flask and AppArmor Security Lab
-
-### Implementation
-
-- `app.py`: Flask application with `/` and `/health` endpoints.
-- `Dockerfile`: Python 3.12-slim image with Flask 3.1.1.
-- `.dockerignore`: excludes unnecessary files from the build context.
-- `apparmor-profile`: custom `devops-lab-profile` with example restrictions.
-- `apply_apparmor.py`: Docker SDK image build, container inspection, execution, and cleanup.
-- `test_restricted_actions.py`: tests reading `/etc/passwd` and executing `/bin/bash`.
-
-### Commands
-
-```powershell
-docker build -t devops-ex05-apparmor:lab .\exercise-05-docker-security
-py .\exercise-05-docker-security\apply_apparmor.py
-py .\exercise-05-docker-security\test_restricted_actions.py
-```
-
-### Verified Results
-
-| Verification | Result |
-|---|---|
-| Docker image build | Passed |
-| Flask `/health` endpoint | Passed (`{"status":"healthy"}`) |
-| Docker SDK integration | Passed; exit code 0 |
-| AppArmor profile syntax | Passed; `apparmor_parser -Q` exit code 0 |
-| Read `/etc/passwd` | Succeeded; exit code 0 |
-| Execute `/bin/bash` | Succeeded; exit code 0 |
-| Temporary container cleanup | Passed |
-| Custom AppArmor enforcement | Not verified |
-
-### Environment Limitation
-
-The lab was tested on Windows 11 with Docker Desktop and Ubuntu WSL2.
-
-Docker reports `name=seccomp,profile=builtin` and `name=cgroupns`, but does not report AppArmor support.
-The WSL2 kernel reports AppArmor as disabled (`N`).
-
-The custom profile passed syntax validation using `apparmor_parser -Q`, but it was not loaded or enforced.
-The restricted-action tests ran without AppArmor and demonstrate baseline behavior only.
-
-On an AppArmor-enabled Linux host, the profile must be loaded and enforcement verified separately.
-A configured Docker security option alone is not proof of enforcement.
-
-**Exercise 05 status: Partially completed because custom AppArmor enforcement is unavailable in this environment.**
+- **AppArmor Host Support:** The laboratory test environment uses Windows 11 with Docker Desktop and Ubuntu WSL2 (`kernel 6.18.54.1-microsoft-standard-WSL2`). In this kernel, AppArmor is disabled (`/sys/module/apparmor/parameters/enabled: N`) and the Docker daemon does not advertise AppArmor support.
+- **Status:** **Partially completed** — Python Docker SDK, Seccomp filtering, container hardening (non-root UID 999), and AppArmor profile syntax validation are completed and verified. Custom AppArmor enforcement cannot be demonstrated without an AppArmor-enabled Linux host.

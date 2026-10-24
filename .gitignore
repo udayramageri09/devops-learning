@@ -12,3 +12,4 @@ venv/
 credentials.json
 secrets.yaml
 DevOps_Evaluation_Metrics_CIE_SEE.pdf
+*.backup

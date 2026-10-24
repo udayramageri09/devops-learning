@@ -1,0 +1,100 @@
+name: DevOps Laboratory CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  python-tests:
+    name: Python Lint & Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Test Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install Flask==3.1.1 docker==7.1.0 prometheus-client==0.21.1 pyyaml
+
+      - name: Validate Python Syntax (All Modules)
+        run: |
+          python -m py_compile \
+            exercise-02-minikube-flask/app.py \
+            exercise-02-minikube-flask/test_app.py \
+            exercise-04-docker-networking/app.py \
+            exercise-05-docker-security/app.py \
+            exercise-05-docker-security/test_app.py \
+            exercise-05-docker-security/apply_apparmor.py \
+            exercise-05-docker-security/test_restricted_actions.py \
+            exercise-05-docker-security/docker_sdk_demo.py \
+            exercise-06-monitoring/app.py \
+            foundations/day-01-linux/experiments/app.py
+          echo "All Python files compiled successfully."
+
+      - name: Run Exercise 02 Unit Tests
+        run: |
+          python -m unittest discover -s exercise-02-minikube-flask -p "test_*.py" -v
+
+      - name: Run Exercise 05 Unit Tests
+        run: |
+          python -m unittest discover -s exercise-05-docker-security -p "test_*.py" -v
+
+      - name: Validate YAML and Kubernetes Manifests
+        run: |
+          python -c "
+          import yaml, glob
+          yaml_files = glob.glob('**/*.yaml', recursive=True) + glob.glob('**/*.yml', recursive=True)
+          for f in yaml_files:
+              with open(f, 'r') as stream:
+                  list(yaml.safe_load_all(stream))
+              print(f'Valid YAML: {f}')
+          "
+
+  docker-builds:
+    name: Docker Images Build & Hardening Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Validate AppArmor Profile Syntax
+        run: |
+          sudo apt-get update && sudo apt-get install -y apparmor-parser
+          apparmor_parser -Q exercise-05-docker-security/apparmor-profile
+          echo "AppArmor profile syntax is valid."
+
+      - name: Build Exercise 02 Image
+        run: |
+          docker build -t devops-ex02-flask:ci ./exercise-02-minikube-flask
+
+      - name: Build Exercise 04 Image
+        run: |
+          docker build -t devops-ex04-flask:ci ./exercise-04-docker-networking
+
+      - name: Build Exercise 05 Hardened Image
+        run: |
+          docker build -t devops-ex05-apparmor:ci ./exercise-05-docker-security
+
+      - name: Verify Exercise 05 Non-Root Execution
+        run: |
+          USER_ID=$(docker run --rm devops-ex05-apparmor:ci id -u)
+          echo "Container running as UID: $USER_ID"
+          if [ "$USER_ID" -eq 0 ]; then
+            echo "ERROR: Container should not run as root (UID 0)"
+            exit 1
+          fi
+          echo "Hardened non-root verification passed (UID=$USER_ID)."
+
+      - name: Build Exercise 06 Monitoring Image
+        run: |
+          docker build -t devops-ex06-monitoring:ci ./exercise-06-monitoring

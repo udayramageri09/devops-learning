@@ -1,4 +1,4 @@
-﻿# DevOps Lab — Quick Revision and Viva Questions
+# DevOps Lab — Quick Revision and Viva Questions
 
 ## Docker
 
@@ -13,6 +13,21 @@ A: A network allowing containers to communicate using container names.
 
 Q: What is the purpose of Docker volumes?
 A: To persist data independently of container lifecycle.
+
+## Container Security
+
+Q: What is the difference between DAC and MAC in Linux?
+A: DAC (Discretionary Access Control) enforces permissions based on user identity and file modes (e.g. non-root UID 999). MAC (Mandatory Access Control, like AppArmor) enforces centralized kernel policies on programs regardless of user privileges.
+
+Q: Why should containers run as a non-root user?
+A: Running as an unprivileged user prevents an attacker from immediately possessing root capabilities if an application vulnerability is compromised.
+
+Q: What is Seccomp?
+A: Secure Computing Mode, a Linux kernel facility that filters and restricts the system calls (syscalls) accessible to a container process.
+
+Q: What is AppArmor?
+A: A Linux Security Module (LSM) that confines programs to specific filesystem paths, network operations, and POSIX capabilities using security profiles.
+
 
 ## Kubernetes
 
