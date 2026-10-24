@@ -1,4 +1,4 @@
-﻿# DevOps Learning and Lab Manual
+# DevOps Learning and Lab Manual
 
 This repository contains the implementation and documentation of 10 DevOps laboratory exercises.
 
@@ -32,11 +32,11 @@ This repository contains the implementation and documentation of 10 DevOps labor
 - Flask applications tested using HTTP requests.
 - ReplicaSet scaling and self-healing demonstrated.
 - Docker container connectivity to MySQL and Redis verified.
-- Docker Python SDK successfully managed containers.
+- Docker Python SDK successfully managed containers; the built-in Seccomp profile was verified.
 - Prometheus collected application metrics.
 - Grafana alert entered the Firing state.
-- Jenkins Freestyle jobs completed successfully.
-- Jenkins five-stage pipeline executed successfully.
+- Jenkins Freestyle jobs completed successfully, including an automatic SCM polling build.
+- Jenkins five-stage pipeline executed successfully, with two Flask unit tests passing and a successful health check.
 - Three-node Minikube cluster reached Ready status.
 - Product Catalog: 2/2 replicas Ready.
 - Shopping Cart: 3/3 replicas Ready.
@@ -52,8 +52,8 @@ This repository contains the implementation and documentation of 10 DevOps labor
 
 ## Important Notes
 
-- AppArmor enforcement was not available in the Docker Desktop/WSL2 environment.
-- Jenkins GitHub integration was tested with manual builds, not automatic webhooks.
+- AppArmor was disabled in the tested WSL2 kernel; custom AppArmor enforcement was not demonstrated. Exercise 05 remains partially completed.
+- Jenkins GitHub integration was verified with manual builds and automatic SCM polling; GitHub webhooks were not configured.
 - Product Catalog and Shopping Cart are demonstration Nginx workloads.
 - Grafana dashboards and alerts were configured through the Grafana interface.
 
