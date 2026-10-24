@@ -78,22 +78,26 @@ Status: Completed and verified
 - Verified both MySQL and Redis reported connected.
 
 ## Exercise 05 — Docker Security and Python Docker SDK
-Date: 19 October 2026
-Status: Partially completed — Docker SDK verified; AppArmor unavailable
+Date: 25 October 2026 (Updated)
+Status: Partially completed — Docker SDK, Seccomp, and Container Hardening verified; AppArmor enforcement unavailable in WSL2
 
 ### Verified
 - Connected Python Docker SDK to Docker Engine 29.8.2.
-- Listed containers.
-- Created and executed a temporary Alpine container.
-- Confirmed exit code 0.
-- Retrieved logs and removed the container.
-- Inspected Docker security options.
+- Hardened Dockerfile with unprivileged system user `appuser` (UID 999), clean logging (`PYTHONUNBUFFERED=1`), and `.pyc` suppression.
+- Built Docker image `devops-ex05-apparmor:lab` and verified container execution runs as UID 999.
+- Refined `apparmor-profile` (`devops-lab-profile`) to allow Python/Flask runtime while demonstrating targeted restrictions (dropping dangerous capabilities, protecting system binary writes, denying credential reads, and blocking `/sbin` binaries).
+- Validated AppArmor profile syntax using `apparmor_parser -Q` with exit code 0.
+- Added and verified Flask microservice unit tests (`test_app.py`) for `/` and `/health` (2/2 passed).
+- Verified Seccomp default filtering (`Seccomp: 2`) and unconfined execution.
+- Executed 5-stage diagnostic test in `apply_apparmor.py` with safe container lifecycle and cleanup.
+- Executed 5-test suite in `test_restricted_actions.py`, proving non-root DAC restrictions against `/etc/shadow` and system tampering while properly isolating DAC from AppArmor MAC.
+- Programmatic container management verified via `docker_sdk_demo.py`.
 
 ### Environment Limitation
-- Docker reported seccomp and cgroupns, but not AppArmor.
-- WSL Ubuntu reported that the AppArmor filesystem was not mounted.
-- Custom AppArmor profile enforcement was not demonstrated.
-- Included an illustrative AppArmor profile for reference.
+- Docker daemon reports `name=seccomp,profile=builtin` and `name=cgroupns`, but does not support AppArmor on this host.
+- WSL2 Linux kernel reports AppArmor as disabled (`/sys/module/apparmor/parameters/enabled: N`).
+- Custom AppArmor enforcement was not and cannot be demonstrated in this environment; profile remains an illustrative and syntactically validated policy.
+
 
 ## Exercise 06 — Monitoring and Alerting
 Date: 19 October 2026

@@ -1,16 +1,66 @@
 #include <tunables/global>
 
+# Exercise 05 — Example AppArmor Security Profile
+# Profile Name: devops-lab-profile
+# Intended Target: Python / Flask Microservice Container
+#
+# Design Rationale:
+# 1. Broad execution denials (such as deny /bin/** x and deny /usr/bin/** x)
+#    prevent standard interpreters, core utilities, and entrypoint wrappers
+#    from launching, causing the container process to fail immediately.
+# 2. Broad read denials on /etc/** break the glibc dynamic linker cache
+#    (/etc/ld.so.cache), user lookups (/etc/passwd), and DNS (/etc/resolv.conf).
+# 3. This profile demonstrates precise Mandatory Access Control (MAC):
+#    - Allows normal Python/Flask execution and network binding
+#    - Denies dangerous capabilities (sys_admin, sys_ptrace, raw I/O)
+#    - Prohibits write access to all system binaries and system libraries
+#    - Prohibits read/write access to sensitive credentials (/etc/shadow, /root)
+#    - Restricts administrative and package manager binaries (/sbin, apt, dpkg)
+#
+# Note: Syntax can be validated via `apparmor_parser -Q`.
+# Enforcement requires an AppArmor-enabled Linux kernel and runtime mediation.
+
 profile devops-lab-profile flags=(attach_disconnected,mediate_deleted) {
-    /** rwklmix,
+  # Include abstractions where supported by the parser
+  /** rwlkmix,
 
-    network inet stream,
-    network inet6 stream,
+  # Network permissions for HTTP service
+  network inet stream,
+  network inet6 stream,
+  network inet dgram,
+  network inet6 dgram,
 
-    capability net_bind_service,
-    deny capability sys_admin,
+  # Capabilities: allow binding to unprivileged/privileged ports, drop root escalations
+  capability net_bind_service,
+  deny capability sys_admin,
+  deny capability sys_ptrace,
+  deny capability sys_rawio,
+  deny capability sys_module,
 
-    deny /etc/** r,
-    deny /var/** w,
-    deny /bin/** x,
-    deny /usr/bin/** x,
+  # Deny write operations to system binaries and library paths
+  deny /bin/** w,
+  deny /sbin/** w,
+  deny /usr/bin/** w,
+  deny /usr/sbin/** w,
+  deny /usr/lib/** w,
+  deny /usr/lib64/** w,
+  deny /lib/** w,
+  deny /lib64/** w,
+
+  # Deny access to sensitive host/system credential stores
+  deny /etc/shadow* rwklx,
+  deny /etc/gshadow* rwklx,
+  deny /etc/sudoers* rwklx,
+  deny /etc/ssh/** rwklx,
+  deny /root/** rwklx,
+
+  # Restrict administrative binaries from executing inside container
+  deny /sbin/** x,
+  deny /usr/sbin/** x,
+  deny /usr/bin/apt* x,
+  deny /usr/bin/dpkg* x,
+
+  # Explicit read/write access for application directories
+  /app/** rw,
+  /tmp/** rw,
 }

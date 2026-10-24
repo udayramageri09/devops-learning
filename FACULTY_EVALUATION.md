@@ -11,7 +11,7 @@ https://github.com/udayramageri09/devops-learning
 | 02 | Flask on Minikube | Docker image, Kubernetes deployment, health endpoint |
 | 03 | ReplicaSet | Scaling and automatic Pod replacement |
 | 04 | Docker Networking | Flask communication with MySQL and Redis |
-| 05 | Docker Security | Security inspection and Docker Python SDK |
+| 05 | Docker Security | Hardened non-root Dockerfile, AppArmor syntax validation, Seccomp filtering, Docker SDK lifecycle, and DAC security test suite |
 | 06 | Monitoring | Prometheus metrics, Grafana dashboard, firing alert |
 | 07 | Jenkins | Successful Freestyle build |
 | 08 | Jenkins and GitHub | Successful manual build and automatic SCM polling build; no webhook |
@@ -31,6 +31,8 @@ https://github.com/udayramageri09/devops-learning
 - Deployment scope: Local to the Jenkins container.
 ## Important Demonstration Commands
 
+```powershell
+# Infrastructure and Orchestration status
 docker ps
 docker network ls
 minikube status
@@ -39,8 +41,17 @@ kubectl get deployments
 kubectl get pods -o wide
 kubectl get services
 kubectl get replicasets
+
+# Exercise 05 Security & Docker SDK Demonstration
+py .\exercise-05-docker-security\apply_apparmor.py
+py .\exercise-05-docker-security\test_restricted_actions.py
+py .\exercise-05-docker-security\docker_sdk_demo.py
+py -m unittest discover -s exercise-05-docker-security -p "test_*.py" -v
+
+# Git & Repository Tracking
 git log --oneline -10
 git status
+```
 
 ## Demonstration URLs
 

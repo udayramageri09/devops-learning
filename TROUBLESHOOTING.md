@@ -1,4 +1,4 @@
-﻿# DevOps Lab — Troubleshooting Guide
+# DevOps Lab — Troubleshooting Guide
 
 ## 1. Docker Command Not Found
 Check Docker Desktop installation and ensure Docker CLI is on PATH.
@@ -79,3 +79,11 @@ git remote -v
 git pull --rebase origin main
 
 Resolve conflicts carefully before pushing again.
+
+## 16. AppArmor Custom Enforcement Unavailable in WSL2
+Symptom: Docker does not report AppArmor under `SecurityOptions` (`docker info`), or `apparmor_parser` reports `interface file missing`.
+Cause: The standard WSL2 Linux kernel disables AppArmor mediation (`/sys/module/apparmor/parameters/enabled: N`).
+Diagnostic:
+Run `py .\exercise-05-docker-security\apply_apparmor.py` to verify the 5-stage diagnostic.
+Profile syntax can be checked with `wsl apparmor_parser -Q exercise-05-docker-security/apparmor-profile`.
+Baseline security and container hardening (`UID 999 appuser`) are verified, but custom kernel enforcement requires an AppArmor-enabled Linux host.
