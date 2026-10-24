@@ -123,3 +123,50 @@ Environment: Windows 11, Docker Desktop, Ubuntu WSL2.
 - Custom AppArmor profile enforcement: not demonstrated.
 
 **Overall status: Partially completed because AppArmor is disabled in the current WSL2 environment.**
+
+## Extended Flask and AppArmor Security Lab
+
+### Implementation
+
+- `app.py`: Flask application with `/` and `/health` endpoints.
+- `Dockerfile`: Python 3.12-slim image with Flask 3.1.1.
+- `.dockerignore`: excludes unnecessary files from the build context.
+- `apparmor-profile`: custom `devops-lab-profile` with example restrictions.
+- `apply_apparmor.py`: Docker SDK image build, container inspection, execution, and cleanup.
+- `test_restricted_actions.py`: tests reading `/etc/passwd` and executing `/bin/bash`.
+
+### Commands
+
+```powershell
+docker build -t devops-ex05-apparmor:lab .\exercise-05-docker-security
+py .\exercise-05-docker-security\apply_apparmor.py
+py .\exercise-05-docker-security\test_restricted_actions.py
+```
+
+### Verified Results
+
+| Verification | Result |
+|---|---|
+| Docker image build | Passed |
+| Flask `/health` endpoint | Passed (`{"status":"healthy"}`) |
+| Docker SDK integration | Passed; exit code 0 |
+| AppArmor profile syntax | Passed; `apparmor_parser -Q` exit code 0 |
+| Read `/etc/passwd` | Succeeded; exit code 0 |
+| Execute `/bin/bash` | Succeeded; exit code 0 |
+| Temporary container cleanup | Passed |
+| Custom AppArmor enforcement | Not verified |
+
+### Environment Limitation
+
+The lab was tested on Windows 11 with Docker Desktop and Ubuntu WSL2.
+
+Docker reports `name=seccomp,profile=builtin` and `name=cgroupns`, but does not report AppArmor support.
+The WSL2 kernel reports AppArmor as disabled (`N`).
+
+The custom profile passed syntax validation using `apparmor_parser -Q`, but it was not loaded or enforced.
+The restricted-action tests ran without AppArmor and demonstrate baseline behavior only.
+
+On an AppArmor-enabled Linux host, the profile must be loaded and enforcement verified separately.
+A configured Docker security option alone is not proof of enforcement.
+
+**Exercise 05 status: Partially completed because custom AppArmor enforcement is unavailable in this environment.**
