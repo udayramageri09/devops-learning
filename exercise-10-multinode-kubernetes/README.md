@@ -1,4 +1,4 @@
-﻿# Exercise 10 — Multinode Kubernetes Cluster
+# Exercise 10 — Multinode Kubernetes Cluster
 
 ## Objective
 
@@ -92,11 +92,11 @@ kubectl get services product-catalog-service shopping-cart-service
 * Total application Pods: 5
 * All application Pods: Running
 
-\- Latest observed restart count: 1 per application Pod
+- Latest observed restart count: 1 per application Pod
 
 
 
-\### Observed Pod Placement
+### Observed Pod Placement
 
 * minikube:
 
@@ -144,7 +144,7 @@ Verified the successful rollout of both Kubernetes deployments.
 
 
 
-\### Commands
+### Commands
 
 
 
@@ -158,7 +158,7 @@ kubectl rollout status deployment/shopping-cart --timeout=120s
 
 
 
-\### Observed Output
+### Observed Output
 
 
 
@@ -172,21 +172,21 @@ deployment "shopping-cart" successfully rolled out
 
 
 
-\### Final Verification Summary
+### Final Verification Summary
 
 
 
-\- All three Kubernetes nodes were `Ready`.
+- All three Kubernetes nodes were `Ready`.
 
-\- Product Catalog: 2/2 replicas ready.
+- Product Catalog: 2/2 replicas ready.
 
-\- Shopping Cart: 3/3 replicas ready.
+- Shopping Cart: 3/3 replicas ready.
 
-\- All five application Pods were running.
+- All five application Pods were running.
 
-\- Application Pods were distributed across the three nodes.
+- Application Pods were distributed across the three nodes.
 
-\- Both deployments successfully rolled out.
+- Both deployments successfully rolled out.
 
 
 

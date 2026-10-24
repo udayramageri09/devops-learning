@@ -1,4 +1,4 @@
-﻿# DevOps Lab Progress
+# DevOps Lab Progress
 
 ## Exercise 01 — Kubernetes Basics with Nginx
 Date: 19 October 2026
@@ -97,7 +97,7 @@ Status: Partially completed — Docker SDK verified; AppArmor unavailable
 
 ## Exercise 06 — Monitoring and Alerting
 Date: 19 October 2026
-Status: Monitoring and Grafana alert verified; Jenkins integration pending
+Status: Monitoring and Grafana alert verified; Jenkins covered separately in Exercises 07–09
 
 - Created a Flask application exposing Prometheus metrics.
 - Implemented request counter and active-user gauge.
@@ -107,7 +107,7 @@ Status: Monitoring and Grafana alert verified; Jenkins integration pending
 - Configured an alert when active users exceed 80.
 - Triggered the alert with active_users = 95.
 - Verified Grafana displayed 1 firing alert.
-- Jenkins integration remains pending.
+- Jenkins integration was outside this exercise's scope; Jenkins was implemented separately in Exercises 07–09.
 
 ## Exercise 07 — Jenkins Installation and CI/CD
 Date: 19 October 2026
@@ -121,14 +121,15 @@ Status: Completed and verified
 
 ## Exercise 08 — Jenkins GitHub Integration
 Date: 19 October 2026
-Status: Completed — manual GitHub checkout and build verified
+Status: Completed — manual build and automatic SCM polling verified
 
 - Created Jenkins Freestyle job devops-github-hello-world.
 - Connected the GitHub repository using Git SCM.
 - Checked out the main branch at commit f72f413.
 - Executed shell commands successfully.
 - Verified build #1 finished with SUCCESS.
-- Automatic webhook triggering not tested.
+- Automatic SCM polling triggered successful build #2 at commit 59249bc.
+- GitHub webhook triggering was not configured or tested.
 
 ## Exercise 09 — Jenkins Multistage CI/CD Pipeline
 Date: 19 October 2026
@@ -139,7 +140,9 @@ Status: Completed and verified
 - Installed Python 3.13.5 inside the Jenkins container.
 - Fixed a UTF-8 BOM parsing issue in the Jenkinsfile.
 - Successfully installed Flask 3.1.1.
-- Verified Python syntax compilation.
+- Ran two Flask unit tests using Python unittest discovery.
+- Verified test_health and test_home both passed (2/2).
+- Verified successful pipeline execution at commit 2a99f23f442d5f511a58aa9457b5934f171af6c0.
 - Started the Flask application.
 - Verified /health returned {"status":"healthy"}.
 - Jenkins pipeline finished with SUCCESS.

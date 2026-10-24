@@ -1,4 +1,4 @@
-﻿# DevOps Lab — Learning Roadmap
+# DevOps Lab — Learning Roadmap
 
 ## Phase 1 — Containerization and Kubernetes
 - Exercise 01: Kubernetes Deployment and Service
@@ -21,7 +21,7 @@
 - Exercise 10: Three-node Kubernetes cluster, replicas and anti-affinity
 
 ## Further Improvements
-- Add automated unit tests to the Jenkins pipeline.
+- Expand the existing Jenkins pipeline's two Flask unit tests with integration and security tests.
 - Build a persistent custom Jenkins image containing Python.
 - Configure GitHub webhook-based build triggering.
 - Push and pull custom images using the Minikube registry.

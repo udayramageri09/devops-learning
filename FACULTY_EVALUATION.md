@@ -14,7 +14,7 @@ https://github.com/udayramageri09/devops-learning
 | 05 | Docker Security | Security inspection and Docker Python SDK |
 | 06 | Monitoring | Prometheus metrics, Grafana dashboard, firing alert |
 | 07 | Jenkins | Successful Freestyle build |
-| 08 | Jenkins and GitHub | Successful repository checkout and build |
+| 08 | Jenkins and GitHub | Successful manual build and automatic SCM polling build; no webhook |
 | 09 | Jenkins Pipeline | Five-stage pipeline SUCCESS on main; 2 Flask unit tests passed; health check successful |
 | 10 | Multinode Kubernetes | Three Ready nodes, five Pods, Service HTTP 200 |
 
@@ -53,7 +53,7 @@ These URLs require the corresponding local containers to be running.
 ## Known Limitations
 
 - AppArmor enforcement was not demonstrated in the WSL environment.
-- Jenkins GitHub integration was tested with a manual build, not a webhook.
+- Jenkins GitHub integration was verified using both manual builds and automatic SCM polling; GitHub webhook triggering was not configured.
 - Exercise 09 deploys locally inside Jenkins, not to production. Its test stage runs two Flask unit tests; broader automated testing is not included.
 - Exercise 10 uses Nginx demonstration workloads.
 - Minikube registry was enabled, but image push and pull were not tested.
