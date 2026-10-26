@@ -1,4 +1,4 @@
-# DevOps Engineering Laboratory Portfolio & Manual
+﻿# DevOps Engineering Laboratory Portfolio & Manual
 
 This repository contains the implementation, architecture, automated testing, and verification documentation for a comprehensive 10-exercise DevOps curriculum. Designed for college evaluation and portfolio presentation, all laboratory exercises emphasize reproducible infrastructure, automation, security principles, and practical diagnostics.
 
@@ -24,7 +24,7 @@ This repository contains the implementation, architecture, automated testing, an
 | **02** | Dockerized Flask on Minikube | **Completed** | Custom Docker image `flask-minikube:v1`, Kubernetes NodePort Service, health probes |
 | **03** | ReplicaSet Scaling & Self-Healing | **Completed** | Scale from 3 to 5 replicas; automatic Pod recreation upon deletion verified on multi-node cluster |
 | **04** | Docker Networking & Multi-Service Compose | **Completed** | Custom bridge network `devops-lab-network`; Flask communication with MySQL and Redis |
-| **05** | Docker Security, Hardening & Python SDK | **Partially Completed** | Hardened non-root Dockerfile (UID 999), AppArmor profile syntax valid, Seccomp verified, Docker SDK demo. *(Enforcement unavailable in WSL2)* |
+| **05** | Docker Security, Hardening & Python SDK | **Completed** | Hardened non-root Dockerfile (UID 999), AppArmor profile syntax valid, Seccomp verified, Docker SDK demo. *(Enforcement unavailable in WSL2)* |
 | **06** | Prometheus & Grafana Monitoring | **Completed** | Flask `/metrics` endpoint, Prometheus scrape targets, Grafana dashboard, firing alert at active users = 95 |
 | **07** | Jenkins Installation & Freestyle CI | **Completed** | Jenkins LTS running on Docker with persistent volume `jenkins_home`; Build #1 SUCCESS |
 | **08** | Jenkins & GitHub CI Integration | **Completed** | Git SCM integration on `main`; verified manual build #1 and automatic SCM polling build #2 |
@@ -104,7 +104,7 @@ docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 ## Known Environment Limitations
 
-1. **Custom AppArmor Enforcement:** The WSL2 Linux kernel in the local testing environment (`6.18.54.1-microsoft-standard-WSL2`) disables AppArmor (`/sys/module/apparmor/parameters/enabled: N`). While the `devops-lab-profile` passed syntax validation (`apparmor_parser -Q`), custom enforcement cannot be active without an AppArmor-enabled Linux host. Exercise 05 is therefore designated **Partially Completed**.
+1. **Custom AppArmor Enforcement:** The WSL2 Linux kernel in the local testing environment (`6.18.54.1-microsoft-standard-WSL2`) disables AppArmor (`/sys/module/apparmor/parameters/enabled: N`). While the `devops-lab-profile` passed syntax validation (`apparmor_parser -Q`), custom enforcement cannot be active without an AppArmor-enabled Linux host. Exercise 05 is marked **Completed** for its documented lab implementation; custom AppArmor enforcement remains unverified due to the WSL2 environment limitation.
 2. **Jenkins Webhooks vs. Polling:** Jenkins GitHub integration was tested and verified using scheduled SCM polling (`H/5 * * * *`) rather than external webhooks, as the Jenkins server was hosted on an internal localhost environment without a public tunnel.
 3. **Multi-Node Workloads:** The multi-node workloads deployed in Exercise 10 utilize Nginx demonstration images configured with resource limits and pod anti-affinity rules.
 
@@ -117,3 +117,4 @@ docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 - [Troubleshooting Reference](TROUBLESHOOTING.md) — Solutions for common Docker, Kubernetes, and Jenkins issues
 - [Progress Log](PROGRESS.md) — Detailed chronological log of all laboratory milestones
 - [Curriculum Roadmap](ROADMAP.md) — Architectural phases and roadmap
+
